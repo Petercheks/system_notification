@@ -20,4 +20,11 @@ class User extends Model
             ->using(UserCategorySubcription::class)
             ->withTimestamps();
     }
+
+    public function channels(): BelongsToMany
+    {
+        return $this->belongsToMany(Channel::class, 'user_channels')
+            ->using(UserChannel::class)
+            ->withTimestamps();
+    }
 }
