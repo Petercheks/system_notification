@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_channels', function (Blueprint $table) {
-            $table->id();
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('channel_id')->constrained('channels');
             $table->timestamps();
+
+            $table->primary(['user_id', 'channel_id']);
         });
     }
 

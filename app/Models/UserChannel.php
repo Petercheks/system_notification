@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
 #[Fillable(['user_id', 'channel_id'])]
-class UserChannel extends Model
+class UserChannel extends Pivot
 {
     public function user(): BelongsTo
     {
