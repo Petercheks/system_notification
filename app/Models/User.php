@@ -17,8 +17,8 @@ class User extends Model
 
     public function subscribed(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class, 'user_category_subcriptions')
-            ->using(UserCategorySubcription::class)
+        return $this->belongsToMany(Category::class, 'user_category_subscriptions')
+            ->using(UserCategorySubscription::class)
             ->withTimestamps();
     }
 

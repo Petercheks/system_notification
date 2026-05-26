@@ -24,7 +24,7 @@ class PushChannel implements NotificationChannelInterface
 
         return NotificationResultDTO::success(
             userId: $user->id,
-            messageId: $message->categoryId,
+            messageId: $message->messageId,
             channelSlug: 'push-notification',
             categorySlug: $categorySlug,
         );

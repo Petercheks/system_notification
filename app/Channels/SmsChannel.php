@@ -24,7 +24,7 @@ class SmsChannel implements NotificationChannelInterface
 
         return NotificationResultDTO::success(
             userId: $user->id,
-            messageId: $message->categoryId,
+            messageId: $message->messageId,
             channelSlug: 'sms',
             categorySlug: $categorySlug,
         );

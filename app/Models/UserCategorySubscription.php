@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
 #[Fillable(['user_id', 'category_id'])]
-class UserCategorySubcription extends Pivot
+class UserCategorySubscription extends Pivot
 {
     public function user(): BelongsTo
     {

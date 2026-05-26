@@ -8,11 +8,17 @@ use Illuminate\Support\Collection;
 
 class UserRepository
 {
-    public function getByCategory(int $categoryId): Collection
+    public function getByCategory(string $categorySlug): Collection
     {
         return User::query()
-            ->whereHas('subscribed', fn($query) => $query->where('categories.id', $categoryId))
-            ->with(['subscribed', 'channels'])
+            ->whereHas(
+                'subscribed',
+                fn($query) => $query->where('categories.slug', $categorySlug)
+            )
+            ->with([
+                'subscribed:id,slug',
+                'channels:id,slug'
+            ])
             ->get()
             ->map(fn(User $user) => UserDTO::fromEloquent($user))
             ->values();

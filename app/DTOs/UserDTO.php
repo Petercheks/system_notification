@@ -11,7 +11,7 @@ readonly class UserDTO
         public string $name,
         public string $email,
         public string $phone,
-        public array  $subcribed,
+        public array  $subscribed,
         public array  $channels,
     ) {}
 
@@ -22,8 +22,8 @@ readonly class UserDTO
             name: $user->name,
             email: $user->email,
             phone: $user->phone,
-            subcribed: $user->subcribed->pluck('category.slug')->toArray(),
-            channels: $user->channels->pluck('channel.slug')->toArray(),
+            subscribed: $user->subscribed->pluck('slug')->toArray(),
+            channels: $user->channels->pluck('slug')->toArray(),
         );
     }
 }
