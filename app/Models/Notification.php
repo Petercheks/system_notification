@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'message_id', 'channel_slug', 'category_slug'])]
+#[Fillable(['user_id', 'message_id', 'channel_slug', 'category_slug', 'status', 'error_message'])]
 class Notification extends Model
 {
     protected $casts = [

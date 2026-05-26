@@ -6,22 +6,27 @@ use App\DTOs\NotificationDTO;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property-read NotificationDTO $resource
+ */
 class NotificationResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        /** @var NotificationDTO $dto */
+        $dto = $this->resource;
 
         return [
-            'id' => $this->id,
-            'user_id' => $this->user_id,
-            'user_name' => $this->user->name,
-            'message_id' => $this->message_id,
-            'message_body' => $this->message->body,
-            'channel_slug' => $this->channel_slug,
-            'category_slug' => $this->category_slug,
-            'status' => $this->status->value,
-            'error_message' => $this->error_message,
-            'created_at' => $this->created_at,
+            'id' => $dto->id,
+            'user_id' => $dto->userId,
+            'user_name' => $dto->userName,
+            'message_id' => $dto->messageId,
+            'message_body' => $dto->messageBody,
+            'channel_slug' => $dto->channelSlug,
+            'category_slug' => $dto->categorySlug,
+            'status' => $dto->status->value,
+            'error_message' => $dto->errorMessage,
+            'created_at' => $dto->createdAt,
         ];
     }
 }
