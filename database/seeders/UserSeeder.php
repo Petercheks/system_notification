@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
         $channels = Channel::all();
 
         User::factory(10)->create()->each(function (User $user) use ($categories, $channels) {
-            $user->subcribed()->attach(
+            $user->subscribed()->attach(
                 $categories->random(rand(1, $categories->count()))->pluck('id')
             );
 

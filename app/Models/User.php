@@ -9,13 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'email', 'phone_number'])]
+#[Fillable(['name', 'email', 'phone'])]
 class User extends Model
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory;
 
-    public function subcribed(): BelongsToMany
+    public function subscribed(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'user_category_subcriptions')
             ->using(UserCategorySubcription::class)
