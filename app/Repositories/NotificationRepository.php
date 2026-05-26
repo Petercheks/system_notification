@@ -11,7 +11,10 @@ class NotificationRepository
     public function get(): Collection
     {
         return Notification::query()
-            ->with(['user:id,name', 'message:id,body'])
+            ->with([
+                'user:id,name',
+                'message:id,body,category_id'
+            ])
             ->latest()
             ->get()
             ->map(fn(Notification $notification) => NotificationDTO::fromEloquent($notification))
