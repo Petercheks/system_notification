@@ -38,10 +38,13 @@ Open [http://localhost:8000](http://localhost:8000).
 
 ## Using the app
 
-The home page (`/`) has two sections:
+Step by step:
 
-1. **Send message form** — pick a category, type a message (max 1000 chars), click *Send*.
-2. **Notifications log** — table that auto-refreshes after each send, showing every delivery attempt with its status (`pending`, `delivered`, `failed`).
+1. Start the stack with `composer dev` (server + queue worker + logs + vite).
+2. Open [http://localhost:8000](http://localhost:8000).
+3. In the **Send message form**, pick a category (`Sports`, `Finance`, `Movies`), type a message (max 1000 chars) and click *Send*.
+4. Scroll down to the **Notifications log** — it auto-refreshes every 5 seconds and shows every delivery attempt with its status (`pending`, `delivered`, `failed`).
+5. Watch rows transition from `pending` (yellow) to `delivered` (green) or `failed` (red) as the queue worker processes them.
 
 Behind the scenes, sending a message:
 
@@ -50,8 +53,6 @@ Behind the scenes, sending a message:
 3. One `notification` row is inserted as `pending` per `(user × enabled channel)`.
 4. One queued job is fired per row (after the DB transaction commits).
 5. Each job calls the right channel (Email / SMS / Push) and updates its row to `delivered` or `failed`.
-
-The dashboard table auto-refreshes every 5 seconds, so you can watch rows transition from `pending` to `delivered`/`failed` as the worker processes them.
 
 ---
 
@@ -150,26 +151,13 @@ No other code needs to change.
 Useful `.env` variables:
 
 
-| Variable           | Default                 | What it does                                     |
-| ------------------ | ----------------------- | ------------------------------------------------ |
-| `DB_CONNECTION`    | `sqlite`                | Database driver. SQLite works out of the box.    |
-| `QUEUE_CONNECTION` | `sync`                  | Use `database` to exercise real async + retries. |
-| `APP_URL`          | `http://localhost:8000` | Public URL for the app.                          |
+| Variable           | Default                 | What it does                                                       |
+| ------------------ | ----------------------- | ------------------------------------------------------------------ |
+| `DB_CONNECTION`    | `sqlite`                | Database driver. SQLite works out of the box.                      |
+| `QUEUE_CONNECTION` | `database`              | Default. Real async + retries. Use `sync` to run jobs inline.      |
+| `APP_URL`          | `http://localhost:8000` | Public URL for the app.                                            |
 
-
-### Watch the `pending → delivered` flow
-
-The `sync` driver runs jobs inline, so notifications jump straight to `delivered`/`failed`. To see the `pending` state in the dashboard:
-
-```bash
-php artisan queue:table
-php artisan migrate
-# in .env:
-#   QUEUE_CONNECTION=database
-php artisan queue:work
-```
-
-Send a message and watch the table — rows appear yellow (`pending`) and turn green/red once the worker picks them up.
+> The `database` queue is enabled by default so you can see the `pending → delivered` flow in the dashboard. `composer dev` already runs the worker for you; if you start the server manually, run `php artisan queue:listen` in a second terminal.
 
 ---
 
