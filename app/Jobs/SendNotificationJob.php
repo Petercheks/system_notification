@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\DTOs\CreateMessageDTO;
 use App\DTOs\UserDTO;
+use App\Enums\NotificationStatus;
 use App\Factories\ChannelFactory;
 use App\Models\Notification;
 use App\Models\User;
@@ -64,7 +65,7 @@ class SendNotificationJob implements ShouldQueue
             'message_id'    => $this->messageId,
             'channel_slug'  => $this->channelSlug,
             'category_slug' => $this->categorySlug,
-            'status'        => 'failed',
+            'status'        => NotificationStatus::Failed,
             'error_message' => $e->getMessage(),
         ]);
     }

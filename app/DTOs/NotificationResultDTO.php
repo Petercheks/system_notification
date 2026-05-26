@@ -2,15 +2,17 @@
 
 namespace App\DTOs;
 
+use App\Enums\NotificationStatus;
+
 readonly class NotificationResultDTO
 {
     public function __construct(
-        public int     $userId,
-        public int     $messageId,
-        public string  $channelSlug,
-        public string  $categorySlug,
-        public string  $status,
-        public ?string $errorMessage = null,
+        public int                $userId,
+        public int                $messageId,
+        public string             $channelSlug,
+        public string             $categorySlug,
+        public NotificationStatus $status,
+        public ?string            $errorMessage = null,
     ) {}
 
     public static function success(
@@ -24,7 +26,7 @@ readonly class NotificationResultDTO
             messageId: $messageId,
             channelSlug: $channelSlug,
             categorySlug: $categorySlug,
-            status: 'success',
+            status: NotificationStatus::Delivered,
         );
     }
 
@@ -40,7 +42,7 @@ readonly class NotificationResultDTO
             messageId: $messageId,
             channelSlug: $channelSlug,
             categorySlug: $categorySlug,
-            status: 'failed',
+            status: NotificationStatus::Failed,
             errorMessage: $errorMessage,
         );
     }

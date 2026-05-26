@@ -16,9 +16,16 @@ class MessageController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'category_slug' => 'required|string|exists:categories,slug',
-            'body'          => 'required|string',
+            'category_slug' => ['required', 'string', 'exists:categories,slug'],
+            'body' => ['required', 'string', 'max:1000'],
         ]);
+
+        if (trim($data['body']) === '') {
+            return response()->json([
+                'message' => 'The given data was invalid.',
+                'errors'  => ['body' => ['The message body cannot be empty.']],
+            ], 422);
+        }
 
         $dto = CreateMessageDTO::fromRequest($data);
 

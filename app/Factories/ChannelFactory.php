@@ -5,6 +5,7 @@ namespace App\Factories;
 use App\Channels\EmailChannel;
 use App\Channels\PushChannel;
 use App\Channels\SmsChannel;
+use App\Enums\ChannelSlug;
 use App\Interfaces\NotificationChannelInterface;
 
 class ChannelFactory
@@ -17,11 +18,13 @@ class ChannelFactory
 
     public function resolve(string $slug): NotificationChannelInterface
     {
-        return match ($slug) {
-            'email' => $this->emailChannel,
-            'sms' => $this->smsChannel,
-            'push-notification' => $this->pushChannel,
-            default => throw new \InvalidArgumentException("Unknown channel: [{$slug}]"),
+        $channel = ChannelSlug::tryFrom($slug)
+            ?? throw new \InvalidArgumentException("Unknown channel: [{$slug}]");
+
+        return match ($channel) {
+            ChannelSlug::Email => $this->emailChannel,
+            ChannelSlug::Sms => $this->smsChannel,
+            ChannelSlug::PushNotification => $this->pushChannel,
         };
     }
 }

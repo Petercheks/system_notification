@@ -2,21 +2,22 @@
 
 namespace App\DTOs;
 
+use App\Enums\NotificationStatus;
 use App\Models\Notification;
 
 readonly class NotificationDTO
 {
     public function __construct(
-        public int     $id,
-        public int     $userId,
-        public string  $userName,
-        public int     $messageId,
-        public string  $messageBody,
-        public string  $channelSlug,
-        public string  $categorySlug,
-        public string  $status,
-        public ?string $errorMessage,
-        public string  $createdAt,
+        public int                $id,
+        public int                $userId,
+        public string             $userName,
+        public int                $messageId,
+        public string             $messageBody,
+        public string             $channelSlug,
+        public string             $categorySlug,
+        public NotificationStatus $status,
+        public ?string            $errorMessage,
+        public string             $createdAt,
     ) {}
 
     public static function fromEloquent(Notification $notification): self
