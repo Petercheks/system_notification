@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('name', 20)->unique();
             $table->string('slug', 20)->unique();
             $table->timestamps();
+
+            $table->unique(['name', 'slug'], 'categories_name_slug_unique');
+            $table->index('slug', 'categories_slug_index');
         });
     }
 

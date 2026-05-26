@@ -20,6 +20,16 @@ return new class extends Migration
             $table->string('status', 20)->default('pending');
             $table->text('error_message')->nullable();
             $table->timestamps();
+
+            $table->index('status', 'notifications_status_index');
+            $table->index('category_slug', 'notifications_category_slug_index');
+            $table->index('channel_slug', 'notifications_channel_slug_index');
+            $table->index('created_at', 'notifications_created_at_index');
+
+            $table->unique(
+                ['user_id', 'message_id', 'channel_slug'],
+                'notifications_user_message_channel_unique',
+            );
         });
     }
 
