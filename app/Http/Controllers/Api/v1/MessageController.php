@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\DTOs\CreateMessageDTO;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreMessageRequest;
 use App\Services\MessageService;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class MessageController extends Controller
 {
@@ -13,27 +14,14 @@ class MessageController extends Controller
         private readonly MessageService $messageService,
     ) {}
 
-    public function store(Request $request)
+    public function store(StoreMessageRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'category_slug' => ['required', 'string', 'exists:categories,slug'],
-            'body' => ['required', 'string', 'max:1000'],
-        ]);
-
-        if (trim($data['body']) === '') {
-            return response()->json([
-                'message' => 'The given data was invalid.',
-                'errors'  => ['body' => ['The message body cannot be empty.']],
-            ], 422);
-        }
-
-        $dto = CreateMessageDTO::fromRequest($data);
+        $dto = CreateMessageDTO::fromRequest($request->validated());
 
         $result = $this->messageService->handle($dto);
 
         return response()->json([
-            'message' => 'Message sent successfully.',
-            'data'    => $result,
+            'data' => $result,
         ], 201);
     }
 }

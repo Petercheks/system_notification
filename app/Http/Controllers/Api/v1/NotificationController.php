@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\NotificationResource;
 use App\Repositories\NotificationRepository;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class NotificationController extends Controller
 {
@@ -12,10 +13,9 @@ class NotificationController extends Controller
         private readonly NotificationRepository $notificationRepository,
     ) {}
 
-    public function index(): JsonResponse
+    public function index(): AnonymousResourceCollection
     {
-        return response()->json([
-            'data' => $this->notificationRepository->get(),
-        ]);
+        $notifications = $this->notificationRepository->get();
+        return NotificationResource::collection($notifications);
     }
 }
