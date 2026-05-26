@@ -41,14 +41,10 @@ class SendNotificationJob implements ShouldQueue
         $channel = $factory->resolve($this->channelSlug);
         $result  = $channel->send($userDTO, $messageDTO, $this->categorySlug);
 
-        Notification::create([
-            'user_id'       => $result->userId,
-            'message_id'    => $result->messageId,
-            'channel_slug'  => $result->channelSlug,
-            'category_slug' => $result->categorySlug,
-            'status'        => $result->status,
-            'error_message' => $result->errorMessage,
-        ]);
+        $this->updateNotification(
+            status: $result->status,
+            errorMessage: $result->errorMessage,
+        );
     }
 
     public function failed(\Throwable $e): void
@@ -60,13 +56,22 @@ class SendNotificationJob implements ShouldQueue
             'error'        => $e->getMessage(),
         ]);
 
-        Notification::create([
-            'user_id'       => $this->userId,
-            'message_id'    => $this->messageId,
-            'channel_slug'  => $this->channelSlug,
-            'category_slug' => $this->categorySlug,
-            'status'        => NotificationStatus::Failed,
-            'error_message' => $e->getMessage(),
-        ]);
+        $this->updateNotification(
+            status: NotificationStatus::Failed,
+            errorMessage: $e->getMessage(),
+        );
+    }
+
+    private function updateNotification(NotificationStatus $status, ?string $errorMessage): void
+    {
+        Notification::query()
+            ->where('user_id', $this->userId)
+            ->where('message_id', $this->messageId)
+            ->where('channel_slug', $this->channelSlug)
+            ->update([
+                'status'        => $status->value,
+                'error_message' => $errorMessage,
+                'updated_at'    => now(),
+            ]);
     }
 }

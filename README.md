@@ -40,15 +40,18 @@ Open [http://localhost:8000](http://localhost:8000).
 
 The home page (`/`) has two sections:
 
-1. **Send message form** — pick a category, type a message (max 1000 chars), click _Send_.
+1. **Send message form** — pick a category, type a message (max 1000 chars), click *Send*.
 2. **Notifications log** — table that auto-refreshes after each send, showing every delivery attempt with its status (`pending`, `delivered`, `failed`).
 
 Behind the scenes, sending a message:
 
 1. `POST /api/v1/messages` creates the message row.
 2. The dispatcher finds every user subscribed to that category.
-3. One queued job is fired per `(user × enabled channel)`.
-4. Each job calls the right channel (Email / SMS / Push) and persists a `notification` row with the outcome.
+3. One `notification` row is inserted as `pending` per `(user × enabled channel)`.
+4. One queued job is fired per row (after the DB transaction commits).
+5. Each job calls the right channel (Email / SMS / Push) and updates its row to `delivered` or `failed`.
+
+The dashboard table auto-refreshes every 5 seconds, so you can watch rows transition from `pending` to `delivered`/`failed` as the worker processes them.
 
 ---
 
@@ -146,20 +149,27 @@ No other code needs to change.
 
 Useful `.env` variables:
 
+
 | Variable           | Default                 | What it does                                     |
 | ------------------ | ----------------------- | ------------------------------------------------ |
 | `DB_CONNECTION`    | `sqlite`                | Database driver. SQLite works out of the box.    |
 | `QUEUE_CONNECTION` | `sync`                  | Use `database` to exercise real async + retries. |
 | `APP_URL`          | `http://localhost:8000` | Public URL for the app.                          |
 
-To switch to the database queue:
+
+### Watch the `pending → delivered` flow
+
+The `sync` driver runs jobs inline, so notifications jump straight to `delivered`/`failed`. To see the `pending` state in the dashboard:
 
 ```bash
 php artisan queue:table
 php artisan migrate
-# set QUEUE_CONNECTION=database in .env
+# in .env:
+#   QUEUE_CONNECTION=database
 php artisan queue:work
 ```
+
+Send a message and watch the table — rows appear yellow (`pending`) and turn green/red once the worker picks them up.
 
 ---
 
@@ -167,13 +177,21 @@ php artisan queue:work
 
 ```bash
 composer test
+# or
+php artisan test
 ```
 
-This runs `php artisan test` against an in-memory SQLite (configured in `phpunit.xml`).
+Runs the full suite (Unit + Feature) against an in-memory SQLite (configured in `phpunit.xml`). To run a single file or filter:
+
+```bash
+php artisan test tests/Feature/Jobs/SendNotificationJobTest.php
+php artisan test --filter=NotificationDispatcher
+```
 
 ---
 
 ## Common commands
+
 
 | Command                            | Purpose                          |
 | ---------------------------------- | -------------------------------- |
@@ -184,11 +202,13 @@ This runs `php artisan test` against an in-memory SQLite (configured in `phpunit
 | `php artisan pail`                 | Tail application logs            |
 | `./vendor/bin/pint`                | Format code (PSR-12)             |
 
+
 ---
 
 ## Troubleshooting
 
 - **Notifications never appear in the log.** Make sure the queue worker is running (`composer dev` does this for you, otherwise run `php artisan queue:listen`).
-- **`422 The selected category is invalid`.** The `category_slug` must match one of `sports`, `finance`, `movies` (run `php artisan db:seed` if missing).
+- `**422 The selected category is invalid`.** The `category_slug` must match one of `sports`, `finance`, `movies` (run `php artisan db:seed` if missing).
 - **Empty log on first load.** Send a message first — there are no notifications until a message is published.
-- **`SQLSTATE[HY000] no such table`.** Run `php artisan migrate`.
+- `**SQLSTATE[HY000] no such table`.** Run `php artisan migrate`.
+

@@ -108,6 +108,15 @@
                         records · newest first
                     </p>
                 </div>
+
+                <div class="flex items-center gap-2 text-xs text-slate-500">
+                    <span
+                        class="h-1.5 w-1.5 rounded-full"
+                        :class="autoRefreshActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'"
+                    ></span>
+                    <span x-show="autoRefreshActive" x-text="`Auto-refresh · ${autoRefreshSeconds}s`"></span>
+                    <span x-show="!autoRefreshActive">Auto-refresh paused</span>
+                </div>
             </div>
 
             {{-- Filters --}}
@@ -244,6 +253,9 @@
                 channel_slug: '',
                 status: '',
             },
+            autoRefreshSeconds: 5,
+            autoRefreshActive: false,
+            refreshTimer: null,
 
             get canSubmit() {
                 return !this.submitting
@@ -263,6 +275,30 @@
 
             async init() {
                 await Promise.all([this.loadCategories(), this.refresh()]);
+                this.startAutoRefresh();
+
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        this.stopAutoRefresh();
+                    } else {
+                        this.refresh();
+                        this.startAutoRefresh();
+                    }
+                });
+            },
+
+            startAutoRefresh() {
+                this.stopAutoRefresh();
+                this.refreshTimer = setInterval(() => this.refresh(), this.autoRefreshSeconds * 1000);
+                this.autoRefreshActive = true;
+            },
+
+            stopAutoRefresh() {
+                if (this.refreshTimer) {
+                    clearInterval(this.refreshTimer);
+                    this.refreshTimer = null;
+                }
+                this.autoRefreshActive = false;
             },
 
             async loadCategories() {
