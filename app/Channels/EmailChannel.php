@@ -15,18 +15,35 @@ class EmailChannel implements NotificationChannelInterface
         CreateMessageDTO $message,
         string           $categorySlug,
     ): NotificationResultDTO {
+        try {
+            // TODO: Implement email sending logic
 
-        Log::info('Email sent', [
-            'to'       => $user->email,
-            'message'  => $message->body,
-            'category' => $categorySlug,
-        ]);
+            Log::info('Email sent', [
+                'to'       => $user->email,
+                'message'  => $message->body,
+                'category' => $categorySlug,
+            ]);
 
-        return NotificationResultDTO::success(
-            userId: $user->id,
-            messageId: $message->messageId,
-            channelSlug: 'email',
-            categorySlug: $categorySlug,
-        );
+            return NotificationResultDTO::success(
+                userId: $user->id,
+                messageId: $message->messageId,
+                channelSlug: 'email',
+                categorySlug: $categorySlug,
+            );
+        } catch (\Throwable $e) {
+            Log::error('Email send failed', [
+                'to'       => $user->email,
+                'category' => $categorySlug,
+                'error'    => $e->getMessage(),
+            ]);
+
+            return NotificationResultDTO::failed(
+                userId: $user->id,
+                messageId: $message->messageId,
+                channelSlug: 'email',
+                categorySlug: $categorySlug,
+                errorMessage: $e->getMessage(),
+            );
+        }
     }
 }

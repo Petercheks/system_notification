@@ -15,18 +15,35 @@ class SmsChannel implements NotificationChannelInterface
         CreateMessageDTO $message,
         string           $categorySlug,
     ): NotificationResultDTO {
+        try {
+            // TODO: Implement SMS sending logic
 
-        Log::info('SMS sent', [
-            'to'       => $user->phone,
-            'message'  => $message->body,
-            'category' => $categorySlug,
-        ]);
+            Log::info('SMS sent', [
+                'to'       => $user->phone,
+                'message'  => $message->body,
+                'category' => $categorySlug,
+            ]);
 
-        return NotificationResultDTO::success(
-            userId: $user->id,
-            messageId: $message->messageId,
-            channelSlug: 'sms',
-            categorySlug: $categorySlug,
-        );
+            return NotificationResultDTO::success(
+                userId: $user->id,
+                messageId: $message->messageId,
+                channelSlug: 'sms',
+                categorySlug: $categorySlug,
+            );
+        } catch (\Throwable $e) {
+            Log::error('SMS send failed', [
+                'to'       => $user->phone,
+                'category' => $categorySlug,
+                'error'    => $e->getMessage(),
+            ]);
+
+            return NotificationResultDTO::failed(
+                userId: $user->id,
+                messageId: $message->messageId,
+                channelSlug: 'sms',
+                categorySlug: $categorySlug,
+                errorMessage: $e->getMessage(),
+            );
+        }
     }
 }
